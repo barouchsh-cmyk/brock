@@ -1,0 +1,171 @@
+mkdir -p ~/sentinel
+cd ~/sentinel
+
+cat > index.html <<'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENTINEL | Cyber Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080b13;color:#f1f5ff;font-family:Inter,sans-serif}
+.sidebar{position:fixed;width:240px;height:100vh;background:#0d1421;border-right:1px solid #202b3c;padding:30px 20px}
+.logo{font-size:24px;font-weight:800;letter-spacing:3px;margin-bottom:55px}
+.logo span{color:#648cff}
+.menu{padding:14px;margin:7px 0;color:#8997ae;font-size:13px;border-radius:8px;cursor:pointer}
+.menu:hover,.menu.active{background:#1b2943;color:white;border-left:3px solid #648cff}
+main{margin-left:240px;padding:40px;max-width:1600px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px}
+h1{font-size:28px;letter-spacing:-1px}
+.sub{color:#8491a8;font-size:12px;margin-top:8px}
+.status{color:#35d6a0;background:#35d6a018;border:1px solid #35d6a044;padding:10px 16px;border-radius:30px;font-size:11px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:17px;margin-bottom:22px}
+.card,.panel{background:#101827;border:1px solid #202b3c;border-radius:12px;padding:23px;transition:.3s}
+.card:hover{transform:translateY(-4px);border-color:#648cff}
+.label{font-size:11px;color:#8794aa}
+.value{font-size:30px;font-weight:700;margin:18px 0 8px}
+.blue{color:#648cff}.red{color:#ff5570}.green{color:#35d6a0}.cyan{color:#35d9d0}
+.change{font-size:10px;color:#35d6a0}
+.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-bottom:20px}
+.panel h2{font-size:15px;margin-bottom:22px}
+.chart{height:250px}
+.panel-head{display:flex;justify-content:space-between;align-items:center}
+.panel-head span{font-size:10px;color:#8491a8}
+table{width:100%;border-collapse:collapse;text-align:left;min-width:500px}
+th{font-size:10px;color:#8794aa;padding:15px;border-bottom:1px solid #263247}
+td{font-size:11px;padding:17px 15px;border-bottom:1px solid #202b3c}
+.tag{padding:6px 9px;background:#ff557018;color:#ff5570;border-radius:5px;font-size:9px}
+.medium{background:#ffbd4818;color:#ffbd48}
+.low{background:#35d6a018;color:#35d6a0}
+.page{display:none}.page.active{display:block}
+button{background:#648cff;border:0;color:white;padding:11px 16px;border-radius:6px;cursor:pointer}
+.event{padding:18px 0;border-bottom:1px solid #202b3c;display:flex;justify-content:space-between;align-items:center}
+.event h3{font-size:12px;margin-bottom:7px}
+.event p{font-size:10px;color:#8794aa}
+footer{text-align:center;padding:35px;color:#65718a;font-size:10px}
+@media(max-width:1000px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:650px){.sidebar{width:65px;padding:20px 7px}.logo{font-size:12px;letter-spacing:0}.menu{font-size:0;padding:15px 5px;text-align:center}.menu:before{content:"◈";font-size:17px}main{margin-left:65px;padding:22px 12px}.cards{grid-template-columns:1fr 1fr}.value{font-size:22px}header{gap:10px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+<div class="logo">SENTINEL<span>.</span></div>
+<div class="menu active" onclick="page('dashboard',this)">◈ Dashboard</div>
+<div class="menu" onclick="page('threats',this)">⚠ Threat Intelligence</div>
+<div class="menu" onclick="page('incidents',this)">◉ Incidents</div>
+<div class="menu" onclick="page('analytics',this)">▥ Analytics</div>
+<div class="menu" onclick="page('about',this)">ⓘ About</div>
+</aside>
+
+<main>
+<header>
+<div>
+<h1 id="title">Security Overview</h1>
+<p class="sub">Cybersecurity Intelligence & Monitoring Platform</p>
+</div>
+<div class="status">● DEMO ENVIRONMENT</div>
+</header>
+
+<section id="dashboard" class="page active">
+<div class="cards">
+<div class="card"><div class="label">SECURITY EVENTS</div><div class="value blue">12,849</div><div class="change">Illustrative data</div></div>
+<div class="card"><div class="label">DETECTED THREATS</div><div class="value red">247</div><div class="change">Illustrative data</div></div>
+<div class="card"><div class="label">BLOCKED REQUESTS</div><div class="value cyan">8,421</div><div class="change">Illustrative data</div></div>
+<div class="card"><div class="label">SYSTEM HEALTH</div><div class="value green">98.7%</div><div class="change">Simulated score</div></div>
+</div>
+
+<div class="grid">
+<div class="panel"><div class="panel-head"><h2>Security Activity</h2><span>LAST 7 DAYS · DEMO</span></div><div class="chart"><canvas id="activity"></canvas></div></div>
+<div class="panel"><div class="panel-head"><h2>Threat Distribution</h2><span>DEMO</span></div><div class="chart"><canvas id="distribution"></canvas></div></div>
+</div>
+
+<div class="panel">
+<h2>Recent Security Events</h2>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>EVENT ID</th><th>EVENT TYPE</th><th>SEVERITY</th><th>STATUS</th><th>TIME</th></tr></thead>
+<tbody>
+<tr><td>#EV-1024</td><td>Suspicious Login</td><td><span class="tag">HIGH</span></td><td>Investigating</td><td>10:42</td></tr>
+<tr><td>#EV-1023</td><td>Port Scan</td><td><span class="tag medium">MEDIUM</span></td><td>Reviewed</td><td>10:38</td></tr>
+<tr><td>#EV-1022</td><td>Access Denied</td><td><span class="tag low">LOW</span></td><td>Resolved</td><td>10:31</td></tr>
+<tr><td>#EV-1021</td><td>Unusual Traffic</td><td><span class="tag">HIGH</span></td><td>Investigating</td><td>10:25</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<section id="threats" class="page">
+<div class="panel">
+<h2>Threat Intelligence Center</h2>
+<div class="event"><div><h3>Suspicious Authentication Pattern</h3><p>Multiple failed login attempts · Demo event</p></div><span class="tag">HIGH</span></div>
+<div class="event"><div><h3>Unusual Network Traffic</h3><p>Abnormal traffic volume · Demo event</p></div><span class="tag medium">MEDIUM</span></div>
+<div class="event"><div><h3>Unrecognized Device</h3><p>New device detected · Demo event</p></div><span class="tag low">LOW</span></div>
+<div class="event"><div><h3>Repeated Access Denial</h3><p>Access policy violation · Demo event</p></div><span class="tag medium">MEDIUM</span></div>
+</div>
+</section>
+
+<section id="incidents" class="page">
+<div class="panel">
+<div class="panel-head"><h2>Incident Management</h2><button onclick="addIncident()">+ New Incident</button></div>
+<div id="incidentList">
+<div class="event"><div><h3>INC-001 · Suspicious Login</h3><p>Security Team · Open</p></div><span class="tag">HIGH</span></div>
+<div class="event"><div><h3>INC-002 · Network Anomaly</h3><p>SOC Team · Reviewing</p></div><span class="tag medium">MEDIUM</span></div>
+</div>
+</div>
+</section>
+
+<section id="analytics" class="page">
+<div class="panel"><h2>Security Analytics</h2><div class="chart"><canvas id="analyticsChart"></canvas></div><p class="sub">All charts use simulated data.</p></div>
+</section>
+
+<section id="about" class="page">
+<div class="panel">
+<h2>About SENTINEL</h2><br>
+<p class="sub" style="line-height:2">
+SENTINEL is a cybersecurity dashboard concept designed to demonstrate security monitoring workflows, threat visualization and incident management.<br><br>
+The platform uses simulated data and does not connect to real networks or security infrastructure.<br><br>
+TECHNOLOGIES: HTML · CSS · JavaScript · Chart.js
+</p>
+</div>
+</section>
+
+<footer>SENTINEL SECURITY INTELLIGENCE PLATFORM · PORTFOLIO PROJECT · 2026</footer>
+</main>
+
+<script>
+function page(id,el){
+document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.menu').forEach(x=>x.classList.remove('active'));
+el.classList.add('active');
+const titles={dashboard:'Security Overview',threats:'Threat Intelligence',incidents:'Incident Management',analytics:'Security Analytics',about:'About Platform'};
+document.getElementById('title').textContent=titles[id];
+}
+
+const opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8794aa'}}},scales:{x:{ticks:{color:'#8794aa'},grid:{color:'#202b3c'}},y:{ticks:{color:'#8794aa'},grid:{color:'#202b3c'}}}};
+
+new Chart(document.getElementById('activity'),{type:'line',data:{labels:['MON','TUE','WED','THU','FRI','SAT','SUN'],datasets:[{label:'Events',data:[120,190,150,280,220,310,260],borderColor:'#648cff',backgroundColor:'#648cff20',fill:true,tension:.4},{label:'Threats',data:[30,45,25,70,55,90,60],borderColor:'#ff5570',tension:.4}]},options:opts});
+
+new Chart(document.getElementById('distribution'),{type:'doughnut',data:{labels:['High','Medium','Low'],datasets:[{data:[25,45,30],backgroundColor:['#ff5570','#ffbd48','#35d6a0'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8794aa'}}}}});
+
+new Chart(document.getElementById('analyticsChart'),{type:'bar',data:{labels:['MON','TUE','WED','THU','FRI','SAT','SUN'],datasets:[{label:'Events',data:[420,590,480,720,650,810,740],backgroundColor:'#648cff',borderRadius:5}]},options:opts});
+
+let count=2;
+function addIncident(){
+count++;
+const div=document.createElement('div');
+div.className='event';
+div.innerHTML='<div><h3>INC-00'+count+' · New Demo Incident</h3><p>Created locally · Open</p></div><span class="tag low">NEW</span>';
+document.getElementById('incidentList').appendChild(div);
+}
+</script>
+</body>
+</html>
+EOF
